@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>1995 Api Dashboard</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.js"
+      integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+      crossorigin="anonymous"></script>
+      <script>
+      $(document).ready(function() {
+          $(document).on('click', '#showall', function() {
+              $.ajax({
+                  method: "GET",
+                  url: "http://localhost:8000/",
+                  crossDomain: true,
+                  success: function(result) {
+                      var html_str = '';
+                      for (var i = 0; i < result.length; i++) {
+                          html_str += '<p class="lead">' + result[i].name + '<button type="button" class="btn btn-danger btn-xs pull-right rmv" name_rmv="' + result[i].name + '">Remove</button></p>';
+                      }
+                      $('#names').html(html_str);
+                  }
+              });
+          });
+          $(document).on('click', '#addname-btn', function() {
+             $.ajax({
+                 method: "GET",
+                 url: "http://localhost:8000/new/" + $('#addname').val(),
+                 success: function(result) {
+                     var html_str = '';
+                     for (var i = 0; i < result.length; i++) {
+                         html_str += '<p class="lead">' + result[i].name + '<button type="button" class="btn btn-danger btn-xs rmv pull-right" name_rmv="' + result[i].name + '">Remove</button></p>';
+                     }
+                     $('#names').html(html_str);
+                 }
+             });
+          });
+          $(document).on('click', '.rmv', function() {
+              $(this).attr('name_rmv');
+              $.ajax({
+                  method: "GET",
+                  url: "http://localhost:8000/remove/" + $(this).attr('name_rmv') + "/",
+                  success: function(result) {
+                      console.log($(this).attr('name_rmv'));
+                      var html_str = '';
+                      for (var i = 0; i < result.length; i++) {
+                          html_str += '<p class="lead">' + result[i].name + '<button type="button" class="btn btn-danger btn-xs pull-right rmv" name_rmv="' + result[i].name + '">Remove</button></p>';
+                      }
+                      $('#names').html(html_str);
+                  }
+              });
+          });
+
+      });
+      </script>
+    <style>
+    * {
+        font-family: lucida, monospace;
+    }
+    </style>
+</head>
+
+<body>
+
+    <!-- begin navbar -->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#"><span class="glyphicon glyphicon-home"></span></a>
+            <p class="navbar-text">1955 Api Dashboard!</p>
+        </div>
+    </nav>
+    <!-- end navbar -->
+
+    <div class="container">
+        <h1 class="text-center">People Born in 1955!</h1>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-2">
+                <button type="button" class="btn btn-default" id="showall">Display All</button>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="addname">
+                </div>
+                <button type="button" class="btn btn-default" id="addname-btn">Add Name</button>
+            </div>
+        </div>
+        <div class="row">
+            <br>
+            <div class="col-md-4 col-md-offset-4 well" id="names">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
