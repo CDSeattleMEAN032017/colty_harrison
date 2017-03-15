@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html ng-app='app'>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="bower_components/angular/angular.js"></script>
+    <script>
+    var app = angular.module('app', []);
+    app.factory('productFactory', function() {
+        var factory = {};
+        var products = [];
+        factory.index = function(callback) {
+            callback(products);
+        };
+        factory.delete = function(id, callback) {
+            products.splice(id, 1);
+            callback(products);
+        };
+        factory.create = function(product, callback) {
+            product.quantity = 50;
+            products.push(product);
+            callback(products);
+        };
+
+        factory.update = function(id, callback) {
+            if (products[id].quantity - 1 > 0) {
+                products[id].quantity -= 1;
+            } else {
+                products[id].quantity = 0;
+            }
+            callback(products);
+        }
+
+        return factory;
+    });
+    app.controller('productController', ['$scope', 'productFactory', function($scope, productFactory) {
+        function setProducts(data) {
+            $scope.products = data;
+            $scope.product = {};
+        }
+
+        $scope.products = [];
+        $scope.product = {};
+        $scope.index = function() {
+            productFactory.index(setProducts);
+        };
+
+        $scope.create = function() {
+            productFactory.create($scope.product, setProducts);
+        };
+
+        $scope.delete = function(id) {
+            productFactory.delete(id, setProducts);
+        };
+
+    }]);
+
+    app.controller('orderController', ['$scope', 'productFactory', function($scope, productFactory) {
+        function setProducts(data) {
+            $scope.products = data;
+            $scope.product = {};
+        }
+
+        $scope.products = [];
+        productFactory.index(setProducts);
+        $scope.update = function(id) {
+            productFactory.update(id, setProducts);
+        }
+    }])
+    </script>
+</head>
+
+<body>
+    <div class="container" ng-controller='productController'>
+        <div class="row">
+            <div class="col-md-2 col-md-offset-5">
+                <h1 class="text-center">Products</h1>
+                <form class="form-horizontal" ng-submit="create()">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" ng-model="product.name" name="name" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input type="text" ng-model="product.price" name="price" class='form-control'>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Create Product</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <h4 ng-if="products.length == 0" class="text-center"><em>No products yet...</em></h4>
+                <table class="table table-striped" ng-if="products.length > 0">
+                    <thead>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="product in products">
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price | currency:"$" }}</td>
+                            <td><button type="button" class="btn btn-danger btn-sm" ng-click="delete($index)">Delete Product</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4" ng-controller='orderController'>
+                <br>
+                <table class="table table-striped" ng-if="products.length > 0">
+                    <thead>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Qty Available</th>
+                        <th>Action</th>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="product in products">
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.price | currency:"$" }}</td>
+                            <td>{{ product.quantity}}</td>
+                            <td><button type="button" class="btn btn-success btn-sm" ng-click="update($index)">Buy Product</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
